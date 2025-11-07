@@ -2,19 +2,14 @@
   "posts": [
     {
       "id": "1",
-      "title": "title1"
+      "title": "title1",
+      "userId":1
     },
     {
       "id": "2",
-      "title": "title2"
-    },
-    {
-      "id": "fa1b",
-      "title": "title3"
-    },
-    {
-      "id": "56cc",
-      "title": "post 4"
+      "title": "title2",
+      "userId":2
+      
     }
   ]
 }

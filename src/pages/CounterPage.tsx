@@ -23,13 +23,16 @@ function CounterPage() {
     };
   };
   return (
-    <>
+    <div className="flex flex-col justify-center items-center">
       <div>{counter}</div>
-      <Button onClick={handleIncrement}>Increment</Button>
-      <Button onClick={handleDecrement}>Decrement</Button>
-      <Button onClick={handleIncrementByAmount(5)}>Increment by amount</Button>
-      {adults}
-    </>
+      <div className="flex  gap-2">
+        <Button onClick={handleIncrement}>Increment</Button>
+        <Button onClick={handleDecrement}>Decrement</Button>
+        <Button onClick={handleIncrementByAmount(5)}>
+          Increment by amount
+        </Button>
+      </div>
+    </div>
   );
 }
 
