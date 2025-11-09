@@ -1,17 +1,23 @@
-import { deletePost, updatePost, type Post } from "@/store/postSlice";
+import {
+  deletePost,
+  updatePost,
+  type Post,
+  selectPostById,
+} from "@/store/postSlice";
 import { Card, CardTitle } from "./ui/card";
 import { Input } from "./ui/input";
 import { useState } from "react";
 import { Button } from "./ui/button";
-import { useAppDispatch } from "@/hooks/useRedux";
+import { useAppDispatch, useAppSelector } from "@/hooks/useRedux";
 
 type Props = {
-  post: Post;
+  id: number;
 };
-const PostDetails = ({ post }: Props) => {
+const PostDetails = ({ id }: Props) => {
   const [editId, setEditId] = useState<number | null>(null);
   const [editText, setEditText] = useState("");
   const dispatch = useAppDispatch();
+  const post = useAppSelector((state) => selectPostById(state, id));
 
   const handleEdit = ({ id, title }: { id: number; title: string }) => {
     setEditId(id);

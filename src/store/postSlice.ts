@@ -1,6 +1,8 @@
 import {
   createSelector,
   createSlice,
+  createEntityAdapter,
+  type EntityState,
   type PayloadAction,
 } from "@reduxjs/toolkit";
 import type { RootState } from "./index";
@@ -16,17 +18,19 @@ export interface Post {
   title: string;
   userId: number;
 }
-interface PostState {
-  items: Post[];
+interface PostState extends EntityState<Post, number> {
+  // items: Post[]; will replace with normalize object
   status: "idle" | "loading" | "succeeded" | "failed";
   error: string | null;
 }
 
-const initialState: PostState = {
-  items: [],
+const postsAdapter = createEntityAdapter<Post>();
+
+const initialState: PostState = postsAdapter.getInitialState({
+  // items: [], will replace with normalize object
   status: "idle",
   error: null,
-};
+});
 
 //types:'posts/fetchposts' , will create actions
 export const fetchPosts = createAppASyncThunk<Post[]>(
@@ -90,31 +94,36 @@ const postSlice = createSlice({
       .addCase(fetchPosts.fulfilled, (state, action) => {
         state.status = "succeeded";
         // state.items = action.payload;
-        state.items.push(...action.payload);
+        // state.items.push(...action.payload);
+        postsAdapter.setAll(state, action.payload);
       })
       .addCase(fetchPosts.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.error.message || "Failed to fetch";
       })
       .addCase(addPost.fulfilled, (state, action) => {
-        state.items.push(action.payload);
+        // state.items.push(action.payload);
+        postsAdapter.addOne(state, action.payload)
       })
       .addCase(addPost.rejected, (state, action) => {
         state.error = action.error.message || "Failed to add post";
       })
       .addCase(updatePost.fulfilled, (state, action: PayloadAction<Post>) => {
-        const index = state.items.findIndex(
-          (post) => post.id === action.payload.id
-        );
-        if (index !== -1) {
-          state.items[index] = action.payload;
-        }
+        const {id , title}= action.payload;
+        postsAdapter.updateOne(state,{id,changes:{title}})
+        // const index = state.items.findIndex(
+        //   (post) => post.id === action.payload.id
+        // );
+        // if (index !== -1) {
+        //   state.items[index] = action.payload;
+        // }
       })
       .addCase(updatePost.rejected, (state, action) => {
         state.error = action.error.message || "Failed to update post";
       })
       .addCase(deletePost.fulfilled, (state, action) => {
-        state.items = state.items.filter((post) => post.id !== action.payload);
+        // state.items = state.items.filter((post) => post.id !== action.payload);
+        postsAdapter.removeOne(state,action.payload)
       })
       .addCase(deletePost.rejected, (state, action) => {
         state.error = action.error.message || "Failed to delete post";
@@ -122,11 +131,13 @@ const postSlice = createSlice({
   },
 });
 
-export const {} = postSlice.actions;
 // export const { selectAllPosts, selectPostByUserId } = postSlice.selectors;
 export const selectPostsStatus = (state: RootState) => state.posts.status;
+export const selectPostsError = (state: RootState) => state.posts.error;
 
-export const selectAllPosts = (state: RootState) => state.posts.items;
+// export const selectAllPosts = (state: RootState) => state.posts.items;
+export const {selectAll:selectAllPosts,selectById:selectPostById,selectIds:selectPostIds } = postsAdapter.getSelectors((state: RootState) => state.posts);
+
 export const selectPostByUserId = createSelector(
   [selectAllPosts, (state: RootState, userId) => userId],
   (posts, userId) => {

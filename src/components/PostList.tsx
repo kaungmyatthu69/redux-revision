@@ -6,6 +6,7 @@ import {
   addPost,
   selectAllPosts,
   selectPostByUserId,
+  selectPostIds
 } from "@/store/postSlice";
 import { Input } from "@/components/ui/input";
 import PostDetails from "@/components/PostDetails";
@@ -15,10 +16,12 @@ function PostList() {
   const [loading, setLoading] = useState(false);
 
   const dispatch = useAppDispatch();
-  const { status, error } = useAppSelector((state) => state.posts);
+  // const { status, error } = useAppSelector((state) => state.posts);
+  const status = useAppSelector((state) => state.posts.status);
+  const error = useAppSelector((state) => state.posts.error);
   // const posts = useAppSelector(selectAllPosts);
-  const posts = useAppSelector((state) => selectPostByUserId(state, 2));
-
+  // const posts = useAppSelector((state) => selectPostByUserId(state, 2));
+const postIds = useAppSelector(selectPostIds)
   const handleAddPost = async () => {
     if (newPost.trim() === "") return;
     setLoading(true);
@@ -57,8 +60,8 @@ function PostList() {
         <div>Loading...</div>
       ) : (
         <div className="flex flex-col gap-5 mt-5">
-          {posts.map((post) => (
-            <PostDetails key={post.id} post={post} />
+          {postIds.map((id:number) => (
+            <PostDetails key={id} id={id} />
           ))}
         </div>
       )}
